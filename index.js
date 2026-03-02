@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 5000;
 
 // إعداد الاتصال بقاعدة البيانات الأونلاين
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: process.env.connectionString,
     ssl: {
         rejectUnauthorized: false // ضروري جداً للاتصال بالسيرفرات السحابية مثل Render و Heroku
     }
