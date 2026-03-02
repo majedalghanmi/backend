@@ -14,7 +14,7 @@ app.post('/login', (req, res) => {
     const { username, password } = req.body;
     
     if (username === 'x' && password === '123') {
-        res.status(200).json({ message: 'تم تسجيل الدخول بنجاح!', user: username });
+        res.status(200).json({ message: 'تم تسجيل الدخول ياماجد!', user: username });
 
 
 
