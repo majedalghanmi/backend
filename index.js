@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path'); // نحتاجه إذا أردت دمج الفرونت مع الباك
 const app = express();
+const pool = require('./db');
 
 // 1. جعل البورت ديناميكي (يقرأ من بيئة الاستضافة أو يستخدم 5000 كاحتياطي)
 const PORT = process.env.PORT || 5000;
@@ -14,6 +15,24 @@ app.post('/login', (req, res) => {
     
     if (username === 'x' && password === '123') {
         res.status(200).json({ message: 'تم تسجيل الدخول بنجاح!', user: username });
+
+
+
+// مثال لجلب بيانات من جدول المستخدمين
+app.get('/users', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM users');
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+app.listen(3000, () => {
+  console.log('Server is running on port 3000');
+});
+
     } else {
         res.status(401).json({ message: 'اسم المستخدم وكلمة المرور غير صحيحة' });
     }
