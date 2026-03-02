@@ -17,7 +17,34 @@ const pool = new Pool({
 
 app.use(cors());
 app.use(express.json());
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// مسار إنشاء مستخدم جديد
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    // التأكد من أن المستخدم غير موجود مسبقاً
+    const userCheck = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+    
+    if (userCheck.rows.length > 0) {
+      return res.status(400).json({ message: 'اسم المستخدم مسجل بالفعل' });
+    }
+
+    // إدخال المستخدم الجديد (ملاحظة: في الحقيقة يجب تشفير كلمة المرور بـ bcrypt)
+    await pool.query(
+      'INSERT INTO users (username, password) VALUES ($1, $2)',
+      [username, password]
+    );
+
+    res.status(201).json({ message: 'تم إنشاء الحساب بنجاح! يمكنك الدخول الآن.' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: 'خطأ في السيرفر' });
+  }
+});
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // مسار تسجيل الدخول
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
