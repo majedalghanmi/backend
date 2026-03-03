@@ -18,7 +18,48 @@ const pool = new Pool({
 app.use(cors());
 app.use(express.json());
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 1. جلب جميع الجهات
+app.get('/contacts', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM contacts ORDER BY id DESC');
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ message: 'خطأ في جلب البيانات' });
+    }
+});
 
+// 2. إضافة اسم جديد
+app.post('/contacts', async (req, res) => {
+    const { name, phone } = req.body;
+    try {
+        await pool.query('INSERT INTO contacts (name, phone) VALUES ($1, $2)', [name, phone]);
+        res.status(201).json({ message: 'تم الحفظ بنجاح' });
+    } catch (err) {
+        res.status(500).json({ message: 'خطأ في الحفظ' });
+    }
+});
+
+// 3. تعديل (بناءً على الاسم كمثال)
+app.put('/contacts', async (req, res) => {
+    const { name, phone } = req.body;
+    try {
+        await pool.query('UPDATE contacts SET phone = $2 WHERE name = $1', [name, phone]);
+        res.json({ message: 'تم التعديل بنجاح' });
+    } catch (err) {
+        res.status(500).json({ message: 'خطأ في التعديل' });
+    }
+});
+
+// 4. حذف
+app.delete('/contacts/:name', async (req, res) => {
+    try {
+        await pool.query('DELETE FROM contacts WHERE name = $1', [req.params.name]);
+        res.json({ message: 'تم الحذف بنجاح' });
+    } catch (err) {
+        res.status(500).json({ message: 'خطأ في الحذف' });
+    }
+});
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // مسار إنشاء مستخدم جديد
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
